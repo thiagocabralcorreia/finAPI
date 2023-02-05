@@ -13,6 +13,7 @@ const customers = [];
  * statement - [])
  */
 
+// Create account
 app.post("/account", (request, response) => {
   const { nino, name } = request.body;
   const customerAlreadyExists = customers.some(
@@ -33,6 +34,19 @@ app.post("/account", (request, response) => {
   });
 
   return response.status(201).send();
+});
+
+// List bank statement
+app.get("/statement/:nino", (request, response) => {
+  const { nino } = request.params;
+
+  const customer = customers.find((customer) => customer.nino === nino);
+
+  if (!customer) {
+    return response.status(400).json({ error: "Customer not found." });
+  }
+
+  return response.json(customer.statement);
 });
 
 app.listen("3333");
