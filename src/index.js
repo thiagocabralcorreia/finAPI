@@ -6,6 +6,21 @@ app.use(express.json());
 
 const customers = [];
 
+// Middleware
+function checkForAccountNINO(request, response, next) {
+  const { nino } = request.headers;
+
+  const customer = customers.find((customer) => customer.nino === nino);
+
+  if (!customer) {
+    return response.status(400).json({ error: "Customer not found." });
+  }
+
+  request.customer = customer;
+
+  return next();
+}
+
 /**
  * nino - string
  * name - string
@@ -36,15 +51,11 @@ app.post("/account", (request, response) => {
   return response.status(201).send();
 });
 
+// app.use(checkForAccountNINO)
+
 // List bank statement
-app.get("/statement/:nino", (request, response) => {
-  const { nino } = request.params;
-
-  const customer = customers.find((customer) => customer.nino === nino);
-
-  if (!customer) {
-    return response.status(400).json({ error: "Customer not found." });
-  }
+app.get("/statement", checkForAccountNINO, (request, response) => {
+  const { customer } = request; // request.customer = customer
 
   return response.json(customer.statement);
 });
