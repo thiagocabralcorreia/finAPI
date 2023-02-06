@@ -118,4 +118,35 @@ app.get("/statement/date", checkForAccountNINO, (request, response) => {
   return response.json(customer.statement);
 });
 
+app.put("/account", checkForAccountNINO, (request, response) => {
+  const { name } = request.body;
+  const { customer } = request;
+
+  customer.name = name;
+
+  return response.send(201).send();
+});
+
+app.get("/account", checkForAccountNINO, (request, response) => {
+  const { customer } = request;
+
+  return response.json(customer);
+});
+
+app.delete("/account", checkForAccountNINO, (request, response) => {
+  const { customer } = request;
+
+  customers.splice(customers.indexOf(customer), 1);
+
+  return response.status(200).json(customers);
+});
+
+app.get("/balance", checkForAccountNINO, (request, response) => {
+  const { customer } = request;
+
+  const balance = getBalance(customer.statement);
+
+  return response.json(balance);
+});
+
 app.listen("3333");
